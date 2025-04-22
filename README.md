@@ -1,2 +1,3 @@
-# OEPNV-Wallet-ZXing-CPP-Adapter
- Ermöglicht der Open-Source-Plattform "ÖPNV-Wallet" den Zugriff auf ZXing-CPP-Funktionalitäten via CLI.
+# Vorabveröffentlichung
+
+ÖPNV-Wallet wurde noch nicht veröffentlicht, der ZXing-CPP-Adapter kann sich daher jederzeit ändern.
