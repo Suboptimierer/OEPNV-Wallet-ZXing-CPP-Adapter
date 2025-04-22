@@ -11,3 +11,14 @@ brew install gcc@14
 ```
 ./build-macos.sh
 ```
+
+
+### Für Linux bauen
+```
+sudo apt update
+sudo apt install -y musl musl-tools cmake git build-essential
+```
+
+```
+./build-linux.sh
+```
