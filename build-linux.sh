@@ -1,12 +1,19 @@
 #!/bin/bash
 set -e
 
+cleanup() {
+  rm -f Dockerfile.temp
+}
+
+trap cleanup EXIT
+
 BIN_NAME="oepnv-wallet-zxing-cpp-adapter"
 DOCKER_IMAGE_NAME="zxing-linux-builder"
 
 echo "Starte Linux-Build via Docker..."
 
 rm -rf build
+rm -f Dockerfile.temp
 
 cat <<EOF > Dockerfile.temp
 FROM alpine:latest
@@ -33,8 +40,6 @@ docker build --platform=linux/amd64 -f Dockerfile.temp -t "$DOCKER_IMAGE_NAME" .
 CONTAINER_ID=$(docker create "$DOCKER_IMAGE_NAME")
 docker cp "$CONTAINER_ID":/app/build/$BIN_NAME ./$BIN_NAME
 docker rm "$CONTAINER_ID"
-
-rm Dockerfile.temp
 
 chmod +x $BIN_NAME
 
