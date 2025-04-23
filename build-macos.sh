@@ -21,4 +21,6 @@ chmod +x $BIN_NAME
 
 strip $BIN_NAME
 
+rm -rf build
+
 echo "Build abgeschlossen. Binary: $BIN_NAME"
