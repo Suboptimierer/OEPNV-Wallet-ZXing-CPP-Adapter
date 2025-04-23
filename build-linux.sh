@@ -1,22 +1,43 @@
 #!/bin/bash
 set -e
 
-BUILD_DIR="build"
 BIN_NAME="oepnv-wallet-zxing-cpp-adapter"
+DOCKER_IMAGE_NAME="zxing-linux-builder"
 
-echo "Starte Linux-Build mit musl-g++..."
+echo "Starte Linux-Build via Docker..."
 
-rm -rf "$BUILD_DIR"
+rm -rf build
 
-cmake -S . -B "$BUILD_DIR" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_C_COMPILER=musl-gcc \
-  -DCMAKE_CXX_COMPILER=musl-g++ \
-  -DCMAKE_EXE_LINKER_FLAGS="-static" \
-  -DBUILD_SHARED_LIBS=OFF \
-  -DZxing_INSTALL=OFF \
-  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cat <<EOF > Dockerfile.temp
+FROM alpine:latest
 
-cmake --build "$BUILD_DIR"
+RUN apk update && apk add --no-cache \\
+    g++ \\
+    musl-dev \\
+    cmake \\
+    make \\
+    git \\
+    build-base
 
-echo "Build abgeschlossen. Binary liegt in: $BUILD_DIR/$BIN_NAME"
+WORKDIR /app
+
+COPY . .
+
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \\
+         -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++" \\
+ && cmake --build build
+EOF
+
+docker build --platform=linux/amd64 -f Dockerfile.temp -t "$DOCKER_IMAGE_NAME" .
+
+CONTAINER_ID=$(docker create "$DOCKER_IMAGE_NAME")
+docker cp "$CONTAINER_ID":/app/build/$BIN_NAME ./$BIN_NAME
+docker rm "$CONTAINER_ID"
+
+rm Dockerfile.temp
+
+chmod +x $BIN_NAME
+
+strip $BIN_NAME
+
+echo "Build abgeschlossen. Binary: $BIN_NAME"

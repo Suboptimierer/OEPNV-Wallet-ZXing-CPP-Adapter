@@ -15,8 +15,7 @@ brew install gcc@14
 
 ### Für Linux bauen
 ```
-sudo apt update
-sudo apt install -y musl musl-tools cmake git build-essential
+brew install docker
 ```
 
 ```
